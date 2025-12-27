@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -17,7 +18,7 @@ export default function Dashboard() {
   const [rantText, setRantText] = useState('')
   const [rantLoading, setRantLoading] = useState(false)
 
-  // Modal notasi artefak
+  // Modal states
   const [activeArtefakId, setActiveArtefakId] = useState(null)
   const [artefakNotationInput, setArtefakNotationInput] = useState('')
 
@@ -138,7 +139,7 @@ export default function Dashboard() {
         emoji_response: ''
       }])
       
-      setSuccess('Rant terlepaskan! 💨')
+      setSuccess('Jejak terlepaskan! 💨')
       setRantText('')
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
@@ -155,538 +156,241 @@ export default function Dashboard() {
     }
   }
 
-  const handleArtefakClick = (index) => {
-    setActiveArtefakId(index)
-    setArtefakNotationInput('')
-  }
-
-  const saveArtefakNotation = async () => {
-    if (artefakNotationInput.length > 300) {
-      setError('Notasi maksimal 300 huruf!')
-      return
-    }
-
-    setSuccess('Notasi disimpan sementara')
+  const saveArtefakNotation = () => {
+    setSuccess('Notasi disimpan ✓')
     setActiveArtefakId(null)
-    setTimeout(() => setSuccess(''), 3000)
+    setArtefakNotationInput('')
+    setTimeout(() => setSuccess(''), 2000)
   }
 
   if (!mounted || !username) {
     return (
-      <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#888' }}>Loading...</div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-gray-400">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: '#000', 
-      color: '#fff', 
-      padding: '16px', 
-      paddingBottom: '80px',
-      fontFamily: 'monospace',
-      fontSize: '14px'
-    }}>
-      <div style={{ 
-        maxWidth: '672px', 
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px'
-      }}>
+    <div className="min-h-screen bg-black text-white p-4 font-mono text-sm">
+      <div className="max-w-2xl mx-auto space-y-6">
 
-        {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '16px',
-          paddingTop: '16px'
-        }}>
-          <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>NOPE</h1>
+        {/* HEADER - Minimal & Clean */}
+        <header className="flex items-center justify-between pt-4 mb-6">
+          <h1 className="text-2xl font-bold tracking-tight">NOPE</h1>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#888',
-              fontSize: '24px',
-              cursor: 'pointer',
-              padding: '4px'
-            }}
+            className="text-gray-500 hover:text-gray-300 transition-colors"
           >
-            ⋮
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
           </button>
-        </div>
+        </header>
 
+        {/* ALERTS - Compact */}
         {error && (
-          <div style={{ 
-            marginBottom: '12px', 
-            padding: '8px 12px', 
-            background: 'rgba(239, 68, 68, 0.1)', 
-            border: '1px solid rgba(239, 68, 68, 0.3)', 
-            borderRadius: '6px', 
-            color: '#ef4444', 
-            fontSize: '12px', 
-            textAlign: 'center' 
-          }}>
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-red-400 text-xs text-center">
             {error}
           </div>
         )}
         
         {success && (
-          <div style={{ 
-            marginBottom: '12px', 
-            padding: '8px 12px', 
-            background: 'rgba(34, 197, 94, 0.1)', 
-            border: '1px solid rgba(34, 197, 94, 0.3)', 
-            borderRadius: '6px', 
-            color: '#22c55e', 
-            fontSize: '12px', 
-            textAlign: 'center' 
-          }}>
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-2 text-green-400 text-xs text-center">
             {success}
           </div>
         )}
 
-        {/* NAVIGASI 4 TOMBOL — SATU BARIS, MONOCHROME */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px', 
-          marginBottom: '24px',
-          background: '#111',
-          border: '1px solid #222',
-          borderRadius: '8px',
-          padding: '6px'
-        }}>
-          <button
-            onClick={() => window.location.href = '/'}
-            style={{
-              background: '#3b82f6',
-              color: '#fff',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '500',
-              fontSize: '12px'
-            }}
-          >
+        {/* NAVIGASI - 4 Tombol Horizontal */}
+        <nav className="grid grid-cols-4 gap-2 bg-gray-900 border border-gray-800 rounded-lg p-2">
+          <button className="bg-blue-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-blue-700 transition-colors">
             Jejak
           </button>
-          <button
-            onClick={() => alert('Frekuensi')}
-            style={{
-              background: '#1f2937',
-              color: '#fff',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: '1px solid #444',
-              cursor: 'pointer',
-              fontWeight: '500',
-              fontSize: '12px'
-            }}
-          >
+          <button className="bg-gray-800 text-gray-300 py-2 px-3 rounded text-xs font-medium hover:bg-gray-700 transition-colors">
             Frekuensi
           </button>
-          <button
-            onClick={() => alert('SayNOPE')}
-            style={{
-              background: '#1f2937',
-              color: '#fff',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: '1px solid #444',
-              cursor: 'pointer',
-              fontWeight: '500',
-              fontSize: '12px'
-            }}
-          >
+          <button className="bg-gray-800 text-gray-300 py-2 px-3 rounded text-xs font-medium hover:bg-gray-700 transition-colors">
             SayNOPE
           </button>
-          <button
-            onClick={() => alert('GLITCH')}
-            style={{
-              background: '#1f2937',
-              color: '#fff',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: '1px solid #444',
-              cursor: 'pointer',
-              fontWeight: '500',
-              fontSize: '12px'
-            }}
-          >
+          <button className="bg-gray-800 text-gray-300 py-2 px-3 rounded text-xs font-medium hover:bg-gray-700 transition-colors">
             GLITCH
           </button>
-        </div>
+        </nav>
 
-        {/* ARTEFAK SECTION — TANPA HEADLINE */}
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ 
-            background: '#111', 
-            border: '1px solid #222', 
-            borderRadius: '8px', 
-            padding: '16px',
-            position: 'relative'
-          }}>
-            {!artefakPreview ? (
-              <label style={{ display: 'block', cursor: canUploadArtefak ? 'pointer' : 'not-allowed' }}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  disabled={!canUploadArtefak}
-                  style={{ display: 'none' }}
-                />
-                <div style={{ 
-                  aspectRatio: '16/9', 
-                  background: '#000', 
-                  border: '1px dashed #444', 
-                  borderRadius: '6px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  color: '#666'
-                }}>
-                  <svg style={{ width: '32px', height: '32px', margin: '0 auto 4px', color: '#666' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* ARTEFAK UPLOAD - Clean & Compact */}
+        <section className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+          {!artefakPreview ? (
+            <label className={`block ${canUploadArtefak ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={!canUploadArtefak}
+                className="hidden"
+              />
+              <div className="aspect-video bg-black border border-dashed border-gray-700 rounded-lg flex items-center justify-center hover:border-gray-600 transition-colors">
+                <div className="text-center">
+                  <svg className="w-10 h-10 mx-auto mb-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p style={{ margin: 0, textAlign: 'center' }}>
+                  <p className="text-gray-500 text-xs">
                     {canUploadArtefak ? 'unggah foto' : 'tunggu 30 hari'}
                   </p>
                 </div>
-              </label>
-            ) : (
-              <div style={{ 
-                position: 'relative', 
-                aspectRatio: '16/9', 
-                background: '#000', 
-                borderRadius: '6px', 
-                overflow: 'hidden' 
-              }}>
-                <img 
-                  src={artefakPreview} 
-                  alt="Preview" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                
-                {/* NOTASI + CTA UNGGAH DI DALAM BOX, RATA KANAN BAWAH */}
-                <div style={{ 
-                  position: 'absolute', 
-                  bottom: '8px', 
-                  left: '8px', 
-                  right: '8px', 
-                  display: 'flex', 
-                  gap: '8px', 
-                  alignItems: 'center' 
-                }}>
+              </div>
+            </label>
+          ) : (
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+              <img src={artefakPreview} alt="Preview" className="w-full h-full object-cover"/>
+              
+              {/* Notasi + CTA - Bottom Overlay */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
+                <div className="flex gap-2 items-end">
                   <input
                     type="text"
                     value={artefakNotation}
                     onChange={(e) => setArtefakNotation(e.target.value)}
                     placeholder="notasi (max 4 kata)"
-                    style={{ 
-                      flex: 1,
-                      background: 'rgba(0,0,0,0.7)', 
-                      backdropFilter: 'blur(2px)', 
-                      border: '1px solid rgba(255,255,255,0.1)', 
-                      borderRadius: '4px', 
-                      padding: '4px 8px', 
-                      fontSize: '12px', 
-                      color: '#fff',
-                      lineHeight: '1.2'
-                    }}
+                    className="flex-1 bg-black/50 backdrop-blur-sm border border-white/20 rounded px-3 py-1.5 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                     maxLength={50}
                   />
                   <button
                     onClick={handleArtefakUpload}
-                    disabled={!artefakNotation.trim() || !canUploadArtefak}
-                    style={{
-                      background: 'rgba(59, 130, 246, 0.2)',
-                      color: '#fff',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '11px',
-                      fontWeight: '500',
-                      animation: 'pulse 2s ease-in-out infinite',
-                      opacity: 0.2
-                    }}
+                    disabled={!artefakNotation.trim()}
+                    className="bg-blue-600/80 hover:bg-blue-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white px-4 py-1.5 rounded text-xs font-medium transition-colors"
                   >
                     unggah
                   </button>
                 </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  {artefakNotation.trim().split(' ').filter(w => w).length}/4 kata
+                </p>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          )}
+        </section>
 
-        {/* RANT BOX SECTION */}
-        <div style={{ marginBottom: '24px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px' }}>Jejakmu</h2>
+        {/* JEJAK (RANT) - Compact */}
+        <section>
+          <h2 className="text-base font-semibold mb-3 text-gray-300">Jejakmu</h2>
           
-          <div style={{ 
-            background: '#111', 
-            border: '1px solid #222', 
-            borderRadius: '8px', 
-            padding: '16px', 
-            position: 'relative' 
-          }}>
-            <textarea
-              value={rantText}
-              onChange={(e) => setRantText(e.target.value)}
-              placeholder="...perasaanmu dalam 300 huruf"
-              style={{ 
-                width: '100%', 
-                background: '#000', 
-                border: '1px solid #444', 
-                borderRadius: '6px', 
-                padding: '8px', 
-                color: '#fff', 
-                fontSize: '14px', 
-                resize: 'vertical',
-                minHeight: '80px',
-                lineHeight: '1.4',
-                paddingRight: '60px' // ruang untuk tombol
-              }}
-              maxLength={300}
-            />
-            
-            {/* CTA LEPASKAN DI DALAM BOX, RATA KANAN BAWAH */}
-            <button
-              onClick={handleRantSubmit}
-              disabled={rantLoading || !rantText.trim()}
-              style={{
-                position: 'absolute',
-                bottom: '8px',
-                right: '8px',
-                background: 'rgba(59, 130, 246, 0.2)',
-                color: '#fff',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '11px',
-                fontWeight: '500',
-                animation: 'pulse 2s ease-in-out infinite',
-                opacity: 0.2
-              }}
-            >
-              {rantLoading ? '...' : 'lepaskan'}
-            </button>
-          </div>
-        </div>
-
-        {/* JEJAKMU - DAFTAR RANT (PLACEHOLDER) */}
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[...Array(5)].map((_, i) => {
-              const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
-              const formattedDate = date.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: 'short'
-              })
-              return (
-                <div key={`rant-placeholder-${i}`} style={{ 
-                  background: '#111', 
-                  border: '1px solid #222', 
-                  borderRadius: '8px', 
-                  padding: '12px', 
-                  position: 'relative',
-                  fontSize: '14px'
-                }}>
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: '6px', 
-                    left: '6px', 
-                    background: '#222', 
-                    color: '#888', 
-                    fontSize: '10px', 
-                    padding: '2px 4px', 
-                    borderRadius: '4px' 
-                  }}>
-                    {formattedDate}
-                  </div>
-                  <p style={{ marginTop: '20px', lineHeight: 1.4, color: '#666' }}>
-                    [Jejakmu akan muncul di sini...]
-                  </p>
-                  
-                  {/* Emoji pulsing */}
-                  <button
-                    onClick={() => {}}
-                    style={{
-                      position: 'absolute',
-                      bottom: '8px',
-                      right: '8px',
-                      background: 'transparent',
-                      border: 'none',
-                      fontSize: '16px',
-                      cursor: 'pointer',
-                      animation: 'pulse 2s ease-in-out infinite'
-                    }}
-                  >
-                    💖
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* TRAY ARTEFAK — 3x2 GRID, KOMPACT */}
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '8px' 
-          }}>
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={`artefak-placeholder-${i}`}
-                onClick={() => handleArtefakClick(i)}
-                style={{
-                  aspectRatio: '1',
-                  background: '#111',
-                  border: '1px solid #222',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#444',
-                  fontSize: '12px',
-                  lineHeight: '1.2'
-                }}
-              >
-                <span>Artefak #{i + 1}</span>
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+            <div className="relative">
+              <textarea
+                value={rantText}
+                onChange={(e) => setRantText(e.target.value)}
+                placeholder="...perasaanmu dalam 300 huruf"
+                className="w-full bg-black border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+                rows={4}
+                maxLength={300}
+              />
+              
+              {/* Counter & CTA */}
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-xs text-gray-500">{rantText.length}/300</span>
+                <button
+                  onClick={handleRantSubmit}
+                  disabled={rantLoading || !rantText.trim()}
+                  className="bg-blue-600/80 hover:bg-blue-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white px-4 py-1 rounded text-xs font-medium transition-colors"
+                >
+                  {rantLoading ? '...' : 'lepaskan'}
+                </button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* JEJAK TIMELINE - Compact Cards */}
+        <section className="space-y-3">
+          {[...Array(3)].map((_, i) => {
+            const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
+            const formattedDate = date.toLocaleDateString('id-ID', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            })
+            return (
+              <div key={i} className="bg-gray-900 border border-gray-800 rounded-lg p-4 relative group hover:border-gray-700 transition-colors">
+                {/* Date Badge */}
+                <span className="inline-block bg-gray-800 text-gray-400 text-xs px-2 py-0.5 rounded mb-2">
+                  {formattedDate}
+                </span>
+                
+                {/* Content */}
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Jejakmu akan muncul di sini. Tulisan yang kamu lepaskan akan tersimpan dalam timeline ini.
+                </p>
+                
+                {/* Emoji Response */}
+                <button className="absolute bottom-3 right-3 text-xl hover:scale-110 transition-transform">
+                  💖
+                </button>
+              </div>
+            )
+          })}
+        </section>
+
+        {/* TRAY ARTEFAK - 3x2 Grid Compact */}
+        <section>
+          <h2 className="text-base font-semibold mb-3 text-gray-300">Artefak</h2>
+          <div className="grid grid-cols-3 gap-2">
+            {[...Array(6)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveArtefakId(i)}
+                className="aspect-square bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-600 transition-colors flex items-center justify-center text-xs text-gray-600"
+              >
+                #{i + 1}
+              </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* TAGLINE PENUTUP */}
-        <div style={{ 
-          textAlign: 'center', 
-          marginTop: '32px', 
-          fontSize: '14px', 
-          color: '#888', 
-          lineHeight: 1.4, 
-          padding: '12px',
-          borderTop: '1px solid #222'
-        }}>
-          “This is our era. And we’re not asking for permission”<br />
-          <span style={{ color: '#343deb', fontSize: '12px' }}>— Glitch Generation</span>
-        </div>
-
-        {/* SETTINGS MENU — DITAMPILKAN DI KANAN ATAS */}
-        {showSettings && (
-          <div style={{
-            position: 'absolute',
-            top: '72px',
-            right: '16px',
-            background: '#111',
-            border: '1px solid #222',
-            borderRadius: '6px',
-            padding: '8px',
-            zIndex: 1000,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-          }}>
-            <button
-              onClick={handleLogout}
-              style={{
-                width: '100%',
-                background: 'transparent',
-                border: '1px solid #444',
-                color: '#888',
-                padding: '6px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                textAlign: 'left',
-                fontSize: '12px'
-              }}
-            >
-              Keluar
-            </button>
-          </div>
-        )}
+        {/* TAGLINE - Elegant */}
+        <footer className="text-center pt-8 pb-4 border-t border-gray-800 space-y-1">
+          <p className="text-xs text-gray-500 italic">
+            "This is our era. And we're not asking for permission"
+          </p>
+          <p className="text-xs text-blue-500 font-medium">— Glitch Generation</p>
+        </footer>
 
       </div>
 
-      {/* Modal Notasi Artefak */}
+      {/* SETTINGS DROPDOWN */}
+      {showSettings && (
+        <div className="fixed top-16 right-4 bg-gray-900 border border-gray-800 rounded-lg shadow-2xl overflow-hidden z-50 w-48">
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+          >
+            Keluar
+          </button>
+        </div>
+      )}
+
+      {/* MODAL NOTASI ARTEFAK */}
       {activeArtefakId !== null && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: '#111',
-            border: '1px solid #222',
-            borderRadius: '8px',
-            padding: '16px',
-            width: '90%',
-            maxWidth: '360px'
-          }}>
-            <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Tambahkan Notasi</h3>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 w-full max-w-sm">
+            <h3 className="text-base font-semibold mb-3">Tambah Notasi</h3>
             <textarea
               value={artefakNotationInput}
               onChange={(e) => setArtefakNotationInput(e.target.value)}
               placeholder="Tulis catatan pribadi (maks. 300 huruf)"
-              style={{
-                width: '100%',
-                background: '#000',
-                border: '1px solid #444',
-                borderRadius: '6px',
-                padding: '8px',
-                color: '#fff',
-                fontSize: '14px',
-                resize: 'vertical',
-                minHeight: '60px',
-                lineHeight: '1.4'
-              }}
+              className="w-full bg-black border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+              rows={4}
               maxLength={300}
             />
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            <div className="flex gap-2 mt-4">
               <button
                 onClick={() => setActiveArtefakId(null)}
-                style={{
-                  flex: 1,
-                  background: 'transparent',
-                  border: '1px solid #444',
-                  color: '#888',
-                  padding: '6px',
-                  borderRadius: '6px',
-                  fontSize: '12px'
-                }}
+                className="flex-1 bg-gray-800 text-gray-300 py-2 rounded text-sm font-medium hover:bg-gray-700 transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={saveArtefakNotation}
-                style={{
-                  flex: 1,
-                  background: '#343deb',
-                  color: '#fff',
-                  border: 'none',
-                  padding: '6px',
-                  borderRadius: '6px',
-                  fontWeight: '500',
-                  fontSize: '12px'
-                }}
+                className="flex-1 bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
               >
                 Simpan
               </button>
@@ -694,15 +398,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
-      {/* CSS Animasi */}
-      <style jsx>{`
-        @keyframes pulse {
-          0% { transform: scale(1); opacity: 0.6; }
-          50% { transform: scale(1.15); opacity: 1; }
-          100% { transform: scale(1); opacity: 0.6; }
-        }
-      `}</style>
     </div>
   )
 }
