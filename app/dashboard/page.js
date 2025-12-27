@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function Dashboard() {
@@ -13,19 +12,22 @@ export default function Dashboard() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [canSubmitArtefak, setCanSubmitArtefak] = useState(true)
-  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   const emojis = ['👀', '🤠', '😭', '🔥']
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('nope_username')
-    if (!storedUsername) {
-      router.push('/')
-      return
+    setMounted(true)
+    if (typeof window !== 'undefined') {
+      const storedUsername = localStorage.getItem('nope_username')
+      if (!storedUsername) {
+        window.location.href = '/'
+        return
+      }
+      setUsername(storedUsername)
+      loadUser(storedUsername)
     }
-    setUsername(storedUsername)
-    loadUser(storedUsername)
-  }, [router])
+  }, [])
 
   const loadUser = async (uname) => {
     const { data } = await supabase
@@ -105,11 +107,21 @@ export default function Dashboard() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('nope_username')
-    router.push('/')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('nope_username')
+      window.location.href = '/'
+    }
   }
 
-  if (!username) return null
+  if (!mounted || !username) {
+    return (
+      <div className="container">
+        <div className="card">
+          <p className="tagline">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container">
