@@ -17,9 +17,7 @@ export default function Dashboard() {
   const [rantText, setRantText] = useState('')
   const [rantLoading, setRantLoading] = useState(false)
   
-  // Data dari DB
-  const [rants, setRants] = useState([])
-  const [artefaks, setArtefaks] = useState([])
+  // Modal notasi artefak
   const [activeArtefakId, setActiveArtefakId] = useState(null)
   const [artefakNotationInput, setArtefakNotationInput] = useState('')
   
@@ -50,8 +48,6 @@ export default function Dashboard() {
     if (data) {
       setUserId(data.id)
       checkArtefakLimit(data.id)
-      fetchRants(data.id)
-      fetchArtefaks(data.id)
     }
   }
 
@@ -68,28 +64,6 @@ export default function Dashboard() {
       .limit(1)
 
     setCanUploadArtefak(!data || data.length === 0)
-  }
-
-  const fetchRants = async (uid) => {
-    const { data } = await supabase
-      .from('rants')
-      .select('*')
-      .eq('user_id', uid)
-      .order('created_at', { ascending: false })
-      .limit(5)
-
-    setRants(data || [])
-  }
-
-  const fetchArtefaks = async (uid) => {
-    const { data } = await supabase
-      .from('artefak')
-      .select('*')
-      .eq('user_id', uid)
-      .order('created_at', { ascending: false })
-      .limit(6)
-
-    setArtefaks(data || [])
   }
 
   const handleImageChange = (e) => {
@@ -138,7 +112,6 @@ export default function Dashboard() {
       setArtefakPreview('')
       setArtefakNotation('')
       setCanUploadArtefak(false)
-      fetchArtefaks(userId)
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Gagal upload. Coba lagi.')
@@ -167,7 +140,6 @@ export default function Dashboard() {
       
       setSuccess('Rant terlepaskan! 💨')
       setRantText('')
-      fetchRants(userId)
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Gagal kirim. Coba lagi.')
@@ -183,12 +155,9 @@ export default function Dashboard() {
     }
   }
 
-  // Simulasi reaksi emoji (pada demo)
-  const mockEmojiResponders = ['@arya', '@dima', '@sena', '@kiko', '@nisa']
-
-  const handleArtefakClick = (artefak) => {
-    setActiveArtefakId(artefak.id)
-    setArtefakNotationInput(artefak.content || '')
+  const handleArtefakClick = (index) => {
+    setActiveArtefakId(index) // Gunakan index sementara sebagai ID placeholder
+    setArtefakNotationInput('')
   }
 
   const saveArtefakNotation = async () => {
@@ -197,20 +166,9 @@ export default function Dashboard() {
       return
     }
 
-    try {
-      await supabase
-        .from('artefak')
-        .update({ content: artefakNotationInput })
-        .eq('id', activeArtefakId)
-      
-      setSuccess('Notasi artefak diperbarui!')
-      setActiveArtefakId(null)
-      fetchArtefaks(userId)
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err) {
-      setError('Gagal menyimpan notasi.')
-      console.error(err)
-    }
+    setSuccess('Notasi disimpan sementara — siap untuk integrasi data nyata')
+    setActiveArtefakId(null)
+    setTimeout(() => setSuccess(''), 3000)
   }
 
   if (!mounted || !username) {
@@ -306,51 +264,34 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 2. ARTEFAK TRAY */}
-        {artefaks.length > 0 && (
-          <div style={{ marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Visual</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-              {artefaks.map((art) => (
-                <div
-                  key={art.id}
-                  onClick={() => handleArtefakClick(art)}
-                  style={{
-                    aspectRatio: '1',
-                    background: '#111',
-                    border: '1px solid #222',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                >
-                  {/* Placeholder gambar — dalam praktik nyata bisa ganti dengan URL dari storage */}
-                  <div style={{ width: '100%', height: '100%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#444' }}>
-                    🖼️
-                  </div>
-                  {art.content && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '8px',
-                      left: '8px',
-                      background: 'rgba(0,0,0,0.6)',
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      maxWidth: '80%',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {art.content}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+        {/* 2. ARTEFAK TRAY - PLACEHOLDER SIAP ISI */}
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Visual</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={`artefak-placeholder-${i}`}
+                onClick={() => handleArtefakClick(i)}
+                style={{
+                  aspectRatio: '1',
+                  background: '#111',
+                  border: '1px solid #222',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#444',
+                  fontSize: '14px'
+                }}
+              >
+                <span>Artefak #{i + 1}</span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* 3. RANT BOX SECTION */}
         <div style={{ marginBottom: '32px' }}>
@@ -384,46 +325,46 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 4. JURNAL RANT - TERAKHIR 5 */}
-        {rants.length > 0 && (
-          <div style={{ marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Rant</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {rants.map((rant) => {
-                const date = new Date(rant.created_at)
-                const formattedDate = date.toLocaleDateString('id-ID', {
-                  day: '2-digit',
-                  month: 'short'
-                })
-                return (
-                  <div key={rant.id} style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '16px', position: 'relative' }}>
-                    <div style={{ position: 'absolute', top: '8px', left: '8px', background: '#222', color: '#888', fontSize: '12px', padding: '2px 6px', borderRadius: '4px' }}>
-                      {formattedDate}
-                    </div>
-                    <p style={{ marginTop: '24px', fontSize: '15px', lineHeight: 1.5 }}>{rant.content}</p>
-                    
-                    {/* Emoji pulsing */}
-                    <button
-                      onClick={() => {}}
-                      style={{
-                        position: 'absolute',
-                        bottom: '12px',
-                        right: '12px',
-                        background: 'transparent',
-                        border: 'none',
-                        fontSize: '20px',
-                        cursor: 'pointer',
-                        animation: 'pulse 2s ease-in-out infinite'
-                      }}
-                    >
-                      💖
-                    </button>
+        {/* 4. JURNAL RANT - PLACEHOLDER SIAP ISI */}
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Rant</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {[...Array(5)].map((_, i) => {
+              const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
+              const formattedDate = date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short'
+              })
+              return (
+                <div key={`rant-placeholder-${i}`} style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '16px', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: '8px', left: '8px', background: '#222', color: '#888', fontSize: '12px', padding: '2px 6px', borderRadius: '4px' }}>
+                    {formattedDate}
                   </div>
-                )
-              })}
-            </div>
+                  <p style={{ marginTop: '24px', fontSize: '15px', lineHeight: 1.5, color: '#666' }}>
+                    [Isi rant akan muncul di sini...]
+                  </p>
+                  
+                  {/* Emoji pulsing */}
+                  <button
+                    onClick={() => {}}
+                    style={{
+                      position: 'absolute',
+                      bottom: '12px',
+                      right: '12px',
+                      background: 'transparent',
+                      border: 'none',
+                      fontSize: '20px',
+                      cursor: 'pointer',
+                      animation: 'pulse 2s ease-in-out infinite'
+                    }}
+                  >
+                    💖
+                  </button>
+                </div>
+              )
+            })}
           </div>
-        )}
+        </div>
 
         {/* 5. TAGLINE PENUTUP */}
         <div style={{ textAlign: 'center', marginTop: '48px', fontSize: '15px', color: '#888', lineHeight: 1.6, padding: '16px' }}>
