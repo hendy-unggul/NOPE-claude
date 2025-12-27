@@ -173,10 +173,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4 font-mono text-sm">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-4">
 
         {/* HEADER - Minimal & Clean */}
-        <header className="flex items-center justify-between pt-4 mb-6">
+        <header className="flex items-center justify-between pt-4 mb-4">
           <h1 className="text-2xl font-bold tracking-tight">NOPE</h1>
           <button
             onClick={() => setShowSettings(!showSettings)}
@@ -190,19 +190,19 @@ export default function Dashboard() {
 
         {/* ALERTS - Compact */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-red-400 text-xs text-center">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-xs text-center">
             {error}
           </div>
         )}
         
         {success && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-2 text-green-400 text-xs text-center">
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-3 text-green-400 text-xs text-center">
             {success}
           </div>
         )}
 
-        {/* NAVIGASI - 4 Tombol Horizontal */}
-        <nav className="grid grid-cols-4 gap-2 bg-gray-900 border border-gray-800 rounded-lg p-2">
+        {/* NAVIGASI - 4 Tombol (PADDING = 4, GAP = 4) */}
+        <nav className="grid grid-cols-4 gap-4 bg-gray-900 border border-gray-800 rounded-lg p-4">
           <button className="bg-blue-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-blue-700 transition-colors">
             Jejak
           </button>
@@ -243,9 +243,9 @@ export default function Dashboard() {
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
               <img src={artefakPreview} alt="Preview" className="w-full h-full object-cover"/>
               
-              {/* Notasi + CTA - Bottom Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
-                <div className="flex gap-2 items-end">
+              {/* Notasi + CTA - Bottom Overlay (PADDING = 4, GAP = 4) */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
+                <div className="flex gap-4 items-end">
                   <input
                     type="text"
                     value={artefakNotation}
@@ -262,7 +262,7 @@ export default function Dashboard() {
                     unggah
                   </button>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-2">
                   {artefakNotation.trim().split(' ').filter(w => w).length}/4 kata
                 </p>
               </div>
@@ -270,9 +270,9 @@ export default function Dashboard() {
           )}
         </section>
 
-        {/* JEJAK (RANT) - Compact */}
+        {/* JEJAK (RANT) - (PADDING = 4) */}
         <section>
-          <h2 className="text-base font-semibold mb-3 text-gray-300">Jejakmu</h2>
+          <h2 className="text-base font-semibold mb-4 text-gray-300">Jejakmu</h2>
           
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
             <div className="relative">
@@ -280,13 +280,13 @@ export default function Dashboard() {
                 value={rantText}
                 onChange={(e) => setRantText(e.target.value)}
                 placeholder="...perasaanmu dalam 300 huruf"
-                className="w-full bg-black border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+                className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
                 rows={4}
                 maxLength={300}
               />
               
-              {/* Counter & CTA */}
-              <div className="flex items-center justify-between mt-2">
+              {/* Counter & CTA (MARGIN TOP = 4) */}
+              <div className="flex items-center justify-between mt-4">
                 <span className="text-xs text-gray-500">{rantText.length}/300</span>
                 <button
                   onClick={handleRantSubmit}
@@ -300,8 +300,8 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* JEJAK TIMELINE - Compact Cards */}
-        <section className="space-y-3">
+        {/* JEJAK TIMELINE (GAP = 4) */}
+        <section className="space-y-4">
           {[...Array(3)].map((_, i) => {
             const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
             const formattedDate = date.toLocaleDateString('id-ID', {
@@ -312,7 +312,7 @@ export default function Dashboard() {
             return (
               <div key={i} className="bg-gray-900 border border-gray-800 rounded-lg p-4 relative group hover:border-gray-700 transition-colors">
                 {/* Date Badge */}
-                <span className="inline-block bg-gray-800 text-gray-400 text-xs px-2 py-0.5 rounded mb-2">
+                <span className="inline-block bg-gray-800 text-gray-400 text-xs px-2 py-0.5 rounded mb-4">
                   {formattedDate}
                 </span>
                 
@@ -322,7 +322,7 @@ export default function Dashboard() {
                 </p>
                 
                 {/* Emoji Response */}
-                <button className="absolute bottom-3 right-3 text-xl hover:scale-110 transition-transform">
+                <button className="absolute bottom-4 right-4 text-xl hover:scale-110 transition-transform">
                   💖
                 </button>
               </div>
@@ -330,10 +330,10 @@ export default function Dashboard() {
           })}
         </section>
 
-        {/* TRAY ARTEFAK - 3x2 Grid Compact */}
+        {/* TRAY ARTEFAK (GAP = 4) */}
         <section>
-          <h2 className="text-base font-semibold mb-3 text-gray-300">Artefak</h2>
-          <div className="grid grid-cols-3 gap-2">
+          <h2 className="text-base font-semibold mb-4 text-gray-300">Artefak</h2>
+          <div className="grid grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
               <button
                 key={i}
@@ -346,8 +346,8 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* TAGLINE - Elegant */}
-        <footer className="text-center pt-8 pb-4 border-t border-gray-800 space-y-1">
+        {/* TAGLINE - Elegant (PADDING TOP = 4) */}
+        <footer className="text-center pt-4 pb-4 border-t border-gray-800 space-y-1">
           <p className="text-xs text-gray-500 italic">
             "This is our era. And we're not asking for permission"
           </p>
@@ -368,20 +368,20 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MODAL NOTASI ARTEFAK */}
+      {/* MODAL NOTASI ARTEFAK (PADDING = 4, GAP = 4) */}
       {activeArtefakId !== null && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 w-full max-w-sm">
-            <h3 className="text-base font-semibold mb-3">Tambah Notasi</h3>
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 w-full max-w-sm">
+            <h3 className="text-base font-semibold mb-4">Tambah Notasi</h3>
             <textarea
               value={artefakNotationInput}
               onChange={(e) => setArtefakNotationInput(e.target.value)}
               placeholder="Tulis catatan pribadi (maks. 300 huruf)"
-              className="w-full bg-black border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
               rows={4}
               maxLength={300}
             />
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-4 mt-4">
               <button
                 onClick={() => setActiveArtefakId(null)}
                 className="flex-1 bg-gray-800 text-gray-300 py-2 rounded text-sm font-medium hover:bg-gray-700 transition-colors"
