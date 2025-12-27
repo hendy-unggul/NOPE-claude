@@ -6,6 +6,7 @@ export default function Dashboard() {
   const [username, setUsername] = useState('')
   const [userId, setUserId] = useState('')
   const [mounted, setMounted] = useState(false)
+  const [showSettings, setShowSettings] = useState(false) // untuk menu titik 3
   
   // Artefak states
   const [artefakImage, setArtefakImage] = useState(null)
@@ -183,9 +184,27 @@ export default function Dashboard() {
     <div style={{ minHeight: '100vh', background: '#000', color: '#fff', padding: '16px', paddingBottom: '80px' }}>
       <div style={{ maxWidth: '672px', margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px', paddingTop: '32px' }}>
-          <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '8px' }}>NOPE</h1>
-          <p style={{ fontSize: '14px', color: '#888' }}>Halo, {username}! 👋</p>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '32px', 
+          paddingTop: '32px' 
+        }}>
+          <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: 0 }}>NOPE</h1>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#888',
+              fontSize: '24px',
+              cursor: 'pointer',
+              padding: '8px'
+            }}
+          >
+            ⋮
+          </button>
         </div>
 
         {error && (
@@ -200,27 +219,27 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* NAVIGASI 4 TOMBOL */}
+        {/* NAVIGASI 4 TOMBOL — SATU BARIS, MONOCHROME */}
         <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(2, 1fr)', 
-          gap: '12px', 
+          display: 'flex', 
+          gap: '8px', 
           marginBottom: '32px',
           background: '#111',
           border: '1px solid #222',
           borderRadius: '12px',
-          padding: '16px'
+          padding: '8px'
         }}>
           <button
             onClick={() => window.location.href = '/'} // Jejak = home
             style={{
               background: '#3b82f6',
               color: '#fff',
-              padding: '12px',
+              padding: '8px 16px',
               borderRadius: '8px',
               border: 'none',
               cursor: 'pointer',
-              fontWeight: '500'
+              fontWeight: '500',
+              fontSize: '14px'
             }}
           >
             Jejak
@@ -230,11 +249,12 @@ export default function Dashboard() {
             style={{
               background: '#1f2937',
               color: '#fff',
-              padding: '12px',
+              padding: '8px 16px',
               borderRadius: '8px',
               border: '1px solid #444',
               cursor: 'pointer',
-              fontWeight: '500'
+              fontWeight: '500',
+              fontSize: '14px'
             }}
           >
             Frekuensi
@@ -242,13 +262,14 @@ export default function Dashboard() {
           <button
             onClick={() => alert('SayNOPE: dari concern ke action — algoritma akan ditentukan')}
             style={{
-              background: '#dc2626',
+              background: '#1f2937',
               color: '#fff',
-              padding: '12px',
+              padding: '8px 16px',
               borderRadius: '8px',
-              border: 'none',
+              border: '1px solid #444',
               cursor: 'pointer',
-              fontWeight: '500'
+              fontWeight: '500',
+              fontSize: '14px'
             }}
           >
             SayNOPE
@@ -256,13 +277,14 @@ export default function Dashboard() {
           <button
             onClick={() => alert('GLITCH: resensi buku, musik, film, hangout, podcast wawancara tokoh')}
             style={{
-              background: '#10b981',
+              background: '#1f2937',
               color: '#fff',
-              padding: '12px',
+              padding: '8px 16px',
               borderRadius: '8px',
-              border: 'none',
+              border: '1px solid #444',
               cursor: 'pointer',
-              fontWeight: '500'
+              fontWeight: '500',
+              fontSize: '14px'
             }}
           >
             GLITCH
@@ -330,42 +352,41 @@ export default function Dashboard() {
           <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejakmu</h2>
           
           <div style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '24px', position: 'relative' }}>
-            <textarea
-              value={rantText}
-              onChange={(e) => setRantText(e.target.value)}
-              placeholder="...perasaanmu dalam 300 huruf"
-              style={{ 
-                width: '100%', 
-                background: '#000', 
-                border: '1px solid #444', 
-                borderRadius: '8px', 
-                padding: '12px', 
-                color: '#fff', 
-                fontSize: '14px', 
-                resize: 'vertical',
-                minHeight: '100px',
-                marginBottom: '8px'
-              }}
-              maxLength={300}
-            />
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p style={{ fontSize: '12px', color: '#888' }}>
-                {rantText.length}/300 huruf
-              </p>
+            <div style={{ position: 'relative' }}>
+              <textarea
+                value={rantText}
+                onChange={(e) => setRantText(e.target.value)}
+                placeholder="...perasaanmu dalam 300 huruf"
+                style={{ 
+                  width: '100%', 
+                  background: '#000', 
+                  border: '1px solid #444', 
+                  borderRadius: '8px', 
+                  padding: '12px', 
+                  color: '#fff', 
+                  fontSize: '14px', 
+                  resize: 'vertical',
+                  minHeight: '100px',
+                  paddingRight: '60px' // ruang untuk tombol
+                }}
+                maxLength={300}
+              />
+              
               <button
                 onClick={handleRantSubmit}
                 disabled={rantLoading || !rantText.trim()}
                 style={{
+                  position: 'absolute',
+                  bottom: '12px',
+                  right: '12px',
                   background: rantText.trim() ? '#3b82f6' : '#444',
                   color: '#fff',
-                  padding: '6px 16px',
-                  borderRadius: '8px',
+                  padding: '4px 12px',
+                  borderRadius: '6px',
                   fontWeight: '500',
-                  fontSize: '14px',
+                  fontSize: '12px',
                   border: 'none',
-                  cursor: rantText.trim() ? 'pointer' : 'not-allowed',
-                  marginLeft: 'auto' // rata kanan tanpa absolute
+                  cursor: rantText.trim() ? 'pointer' : 'not-allowed'
                 }}
               >
                 {rantLoading ? '...' : 'lepaskan'}
@@ -448,13 +469,38 @@ export default function Dashboard() {
           <span style={{ color: '#343deb' }}>— Glitch Generation</span>
         </div>
 
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          style={{ width: '100%', background: 'transparent', border: '1px solid #444', color: '#888', padding: '12px', borderRadius: '8px', cursor: 'pointer', marginTop: '32px' }}
-        >
-          Keluar
-        </button>
+        {/* SETTINGS MENU — DITAMPILKAN DI KANAN ATAS */}
+        {showSettings && (
+          <div style={{
+            position: 'absolute',
+            top: '80px',
+            right: '16px',
+            background: '#111',
+            border: '1px solid #222',
+            borderRadius: '8px',
+            padding: '12px',
+            zIndex: 1000,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+          }}>
+            <button
+              onClick={handleLogout}
+              style={{
+                width: '100%',
+                background: 'transparent',
+                border: '1px solid #444',
+                color: '#888',
+                padding: '8px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontSize: '14px'
+              }}
+            >
+              Keluar
+            </button>
+          </div>
+        )}
+
       </div>
 
       {/* Modal Notasi Artefak */}
