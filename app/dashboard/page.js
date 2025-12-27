@@ -200,16 +200,77 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* 1. ARTEFAK SECTION */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Artefak</h2>
-          
-          {!canUploadArtefak && (
-            <div style={{ marginBottom: '16px', padding: '16px', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', borderRadius: '8px', color: '#eab308', fontSize: '14px' }}>
-              Artefak berikutnya bisa diunggah 30 hari lagi
-            </div>
-          )}
+        {/* NAVIGASI 4 TOMBOL */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(2, 1fr)', 
+          gap: '12px', 
+          marginBottom: '32px',
+          background: '#111',
+          border: '1px solid #222',
+          borderRadius: '12px',
+          padding: '16px'
+        }}>
+          <button
+            onClick={() => window.location.href = '/'} // Jejak = home
+            style={{
+              background: '#3b82f6',
+              color: '#fff',
+              padding: '12px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+          >
+            Jejak
+          </button>
+          <button
+            onClick={() => alert('Frekuensi: temukan user lain berdasarkan 3 keyword dari PopCulture, PersonalPain, SocialSickness')}
+            style={{
+              background: '#1f2937',
+              color: '#fff',
+              padding: '12px',
+              borderRadius: '8px',
+              border: '1px solid #444',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+          >
+            Frekuensi
+          </button>
+          <button
+            onClick={() => alert('SayNOPE: dari concern ke action — algoritma akan ditentukan')}
+            style={{
+              background: '#dc2626',
+              color: '#fff',
+              padding: '12px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+          >
+            SayNOPE
+          </button>
+          <button
+            onClick={() => alert('GLITCH: resensi buku, musik, film, hangout, podcast wawancara tokoh')}
+            style={{
+              background: '#10b981',
+              color: '#fff',
+              padding: '12px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+          >
+            GLITCH
+          </button>
+        </div>
 
+        {/* 1. ARTEFAK SECTION — TANPA HEADLINE */}
+        <div style={{ marginBottom: '32px' }}>
           <div style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '24px', position: 'relative' }}>
             {!artefakPreview ? (
               <label style={{ display: 'block', cursor: canUploadArtefak ? 'pointer' : 'not-allowed' }}>
