@@ -172,34 +172,4 @@ button:disabled {
   color: #ef4444;
   background: transparent;
 }
-```
 
-5. **Commit changes**
-
----
-
-### **Kalau file SUDAH ADA tapi error:**
-
-Kemungkinan:
-1. File kosong → **Edit** dan paste CSS lengkap di atas
-2. Nama file salah (misal: `global.css` atau `style.css`) → **Rename** jadi `globals.css`
-3. Lokasi salah (misal di root atau di folder lain) → **Pindahkan** ke folder `app`
-
----
-
-## 📁 **STRUKTUR YANG BENAR:**
-```
-NOPE-claude/
-├── jsconfig.json          ✓
-├── package.json           ✓
-├── next.config.js         ✓
-├── lib/
-│   └── supabase.js        ✓
-├── app/
-│   ├── layout.js          ✓
-│   ├── page.js            ✓
-│   ├── globals.css        ← HARUS ADA DI SINI!
-│   └── dashboard/
-│       └── page.js        ✓
-└── public/
-    └── manifest.json      ✓
