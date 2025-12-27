@@ -1,4 +1,3 @@
-'use client'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
@@ -409,11 +408,11 @@ export default function Dashboard() {
                     style={{
                       background: 'rgba(59, 130, 246, 0.2)',
                       color: '#fff',
-                      padding: '4px 8px',
+                      padding: '2px 6px',
                       borderRadius: '4px',
                       border: 'none',
                       cursor: 'pointer',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontWeight: '500',
                       animation: 'pulse 2s ease-in-out infinite',
                       opacity: 0.2
@@ -468,11 +467,11 @@ export default function Dashboard() {
                 right: '8px',
                 background: 'rgba(59, 130, 246, 0.2)',
                 color: '#fff',
-                padding: '4px 8px',
+                padding: '2px 6px',
                 borderRadius: '4px',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: '500',
                 animation: 'pulse 2s ease-in-out infinite',
                 opacity: 0.2
