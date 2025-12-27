@@ -1,13 +1,11 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function Home() {
   const [username, setUsername] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -36,8 +34,10 @@ export default function Home() {
         if (insertError) throw insertError
       }
 
-      localStorage.setItem('nope_username', username.toLowerCase())
-      router.push('/dashboard')
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('nope_username', username.toLowerCase())
+        window.location.href = '/dashboard'
+      }
     } catch (err) {
       setError('Terjadi error. Coba lagi.')
       console.error(err)
