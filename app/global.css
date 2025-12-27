@@ -172,3 +172,26 @@ button:disabled {
   color: #ef4444;
   background: transparent;
 }
+```
+
+4. Klik **Commit changes**
+
+---
+
+## 📋 **CHECKLIST - Pastikan File Ini Ada di Repo:**
+
+Cek di GitHub repo Anda, harus ada struktur seperti ini:
+```
+✓ package.json
+✓ next.config.js
+✓ .gitignore
+✓ lib/
+  ✓ supabase.js          ← HARUS ADA!
+✓ app/
+  ✓ layout.js
+  ✓ page.js
+  ✓ globals.css          ← HARUS ADA!
+  ✓ dashboard/
+    ✓ page.js
+✓ public/
+  ✓ manifest.json
