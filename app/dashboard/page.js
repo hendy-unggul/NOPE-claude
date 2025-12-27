@@ -156,7 +156,7 @@ export default function Dashboard() {
   }
 
   const handleArtefakClick = (index) => {
-    setActiveArtefakId(index) // Gunakan index sementara sebagai ID placeholder
+    setActiveArtefakId(index)
     setArtefakNotationInput('')
   }
 
@@ -166,7 +166,7 @@ export default function Dashboard() {
       return
     }
 
-    setSuccess('Notasi disimpan sementara — siap untuk integrasi data nyata')
+    setSuccess('Notasi disimpan sementara')
     setActiveArtefakId(null)
     setTimeout(() => setSuccess(''), 3000)
   }
@@ -264,9 +264,97 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 2. ARTEFAK TRAY - PLACEHOLDER SIAP ISI */}
+        {/* 2. RANT BOX SECTION */}
         <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Visual</h2>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejakmu</h2>
+          
+          <div style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '24px', position: 'relative' }}>
+            <textarea
+              value={rantText}
+              onChange={(e) => setRantText(e.target.value)}
+              placeholder="...perasaanmu dalam 300 huruf"
+              style={{ 
+                width: '100%', 
+                background: '#000', 
+                border: '1px solid #444', 
+                borderRadius: '8px', 
+                padding: '12px', 
+                color: '#fff', 
+                fontSize: '14px', 
+                resize: 'vertical',
+                minHeight: '100px',
+                marginBottom: '8px'
+              }}
+              maxLength={300}
+            />
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <p style={{ fontSize: '12px', color: '#888' }}>
+                {rantText.length}/300 huruf
+              </p>
+              <button
+                onClick={handleRantSubmit}
+                disabled={rantLoading || !rantText.trim()}
+                style={{
+                  background: rantText.trim() ? '#3b82f6' : '#444',
+                  color: '#fff',
+                  padding: '6px 16px',
+                  borderRadius: '8px',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  border: 'none',
+                  cursor: rantText.trim() ? 'pointer' : 'not-allowed',
+                  marginLeft: 'auto' // rata kanan tanpa absolute
+                }}
+              >
+                {rantLoading ? '...' : 'lepaskan'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. JEJAKMU - DAFTAR RANT (PLACEHOLDER) */}
+        <div style={{ marginBottom: '32px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {[...Array(5)].map((_, i) => {
+              const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
+              const formattedDate = date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short'
+              })
+              return (
+                <div key={`rant-placeholder-${i}`} style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '16px', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: '8px', left: '8px', background: '#222', color: '#888', fontSize: '12px', padding: '2px 6px', borderRadius: '4px' }}>
+                    {formattedDate}
+                  </div>
+                  <p style={{ marginTop: '24px', fontSize: '15px', lineHeight: 1.5, color: '#666' }}>
+                    [Jejakmu akan muncul di sini...]
+                  </p>
+                  
+                  {/* Emoji pulsing */}
+                  <button
+                    onClick={() => {}}
+                    style={{
+                      position: 'absolute',
+                      bottom: '12px',
+                      right: '12px',
+                      background: 'transparent',
+                      border: 'none',
+                      fontSize: '20px',
+                      cursor: 'pointer',
+                      animation: 'pulse 2s ease-in-out infinite'
+                    }}
+                  >
+                    💖
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* 4. TRAY ARTEFAK — TANPA SUBHEADING, LANGSUNG MENYATU */}
+        <div style={{ marginBottom: '32px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[...Array(6)].map((_, i) => (
               <div
@@ -290,79 +378,6 @@ export default function Dashboard() {
                 <span>Artefak #{i + 1}</span>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* 3. RANT BOX SECTION */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Rant</h2>
-          
-          <div style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '24px', position: 'relative' }}>
-            <div style={{ position: 'relative' }}>
-              <textarea
-                value={rantText}
-                onChange={(e) => setRantText(e.target.value)}
-                placeholder="...perasaanmu dalam 300 huruf"
-                style={{ width: '100%', background: '#000', border: '1px solid #444', borderRadius: '8px', padding: '12px', paddingRight: '120px', color: '#fff', fontSize: '14px', resize: 'none' }}
-                rows={5}
-                maxLength={300}
-              />
-              
-              <button
-                onClick={handleRantSubmit}
-                disabled={rantLoading || !rantText.trim()}
-                style={{ position: 'absolute', bottom: '12px', right: '12px', background: rantText.trim() ? '#3b82f6' : '#444', color: '#fff', padding: '6px 20px', borderRadius: '8px', fontWeight: '500', fontSize: '14px', border: 'none', cursor: rantText.trim() ? 'pointer' : 'not-allowed' }}
-              >
-                {rantLoading ? '...' : 'lepaskan'}
-              </button>
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-              <p style={{ fontSize: '12px', color: '#888' }}>
-                {rantText.length}/300 huruf
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* 4. JURNAL RANT - PLACEHOLDER SIAP ISI */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Rant</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[...Array(5)].map((_, i) => {
-              const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
-              const formattedDate = date.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: 'short'
-              })
-              return (
-                <div key={`rant-placeholder-${i}`} style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '16px', position: 'relative' }}>
-                  <div style={{ position: 'absolute', top: '8px', left: '8px', background: '#222', color: '#888', fontSize: '12px', padding: '2px 6px', borderRadius: '4px' }}>
-                    {formattedDate}
-                  </div>
-                  <p style={{ marginTop: '24px', fontSize: '15px', lineHeight: 1.5, color: '#666' }}>
-                    [Isi rant akan muncul di sini...]
-                  </p>
-                  
-                  {/* Emoji pulsing */}
-                  <button
-                    onClick={() => {}}
-                    style={{
-                      position: 'absolute',
-                      bottom: '12px',
-                      right: '12px',
-                      background: 'transparent',
-                      border: 'none',
-                      fontSize: '20px',
-                      cursor: 'pointer',
-                      animation: 'pulse 2s ease-in-out infinite'
-                    }}
-                  >
-                    💖
-                  </button>
-                </div>
-              )
-            })}
           </div>
         </div>
 
