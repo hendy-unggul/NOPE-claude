@@ -12,12 +12,16 @@ export default function Dashboard() {
   const [artefakPreview, setArtefakPreview] = useState('')
   const [artefakNotation, setArtefakNotation] = useState('')
   const [canUploadArtefak, setCanUploadArtefak] = useState(true)
-  const [showArtefakEmojis, setShowArtefakEmojis] = useState(false)
-  const [artefakResponders, setArtefakResponders] = useState([])
   
   // Rant states
   const [rantText, setRantText] = useState('')
   const [rantLoading, setRantLoading] = useState(false)
+  
+  // Data dari DB
+  const [rants, setRants] = useState([])
+  const [artefaks, setArtefaks] = useState([])
+  const [activeArtefakId, setActiveArtefakId] = useState(null)
+  const [artefakNotationInput, setArtefakNotationInput] = useState('')
   
   // General states
   const [error, setError] = useState('')
@@ -46,6 +50,8 @@ export default function Dashboard() {
     if (data) {
       setUserId(data.id)
       checkArtefakLimit(data.id)
+      fetchRants(data.id)
+      fetchArtefaks(data.id)
     }
   }
 
@@ -62,6 +68,28 @@ export default function Dashboard() {
       .limit(1)
 
     setCanUploadArtefak(!data || data.length === 0)
+  }
+
+  const fetchRants = async (uid) => {
+    const { data } = await supabase
+      .from('rants')
+      .select('*')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(5)
+
+    setRants(data || [])
+  }
+
+  const fetchArtefaks = async (uid) => {
+    const { data } = await supabase
+      .from('artefak')
+      .select('*')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(6)
+
+    setArtefaks(data || [])
   }
 
   const handleImageChange = (e) => {
@@ -99,8 +127,6 @@ export default function Dashboard() {
     }
 
     try {
-      // NOTE: Ini versi simple - foto tidak diupload ke storage
-      // Hanya save notasi saja
       await supabase.from('artefak').insert([{
         user_id: userId,
         content: artefakNotation.trim(),
@@ -112,6 +138,7 @@ export default function Dashboard() {
       setArtefakPreview('')
       setArtefakNotation('')
       setCanUploadArtefak(false)
+      fetchArtefaks(userId)
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Gagal upload. Coba lagi.')
@@ -140,6 +167,7 @@ export default function Dashboard() {
       
       setSuccess('Rant terlepaskan! 💨')
       setRantText('')
+      fetchRants(userId)
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Gagal kirim. Coba lagi.')
@@ -152,6 +180,36 @@ export default function Dashboard() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('nope_username')
       window.location.href = '/'
+    }
+  }
+
+  // Simulasi reaksi emoji (pada demo)
+  const mockEmojiResponders = ['@arya', '@dima', '@sena', '@kiko', '@nisa']
+
+  const handleArtefakClick = (artefak) => {
+    setActiveArtefakId(artefak.id)
+    setArtefakNotationInput(artefak.content || '')
+  }
+
+  const saveArtefakNotation = async () => {
+    if (artefakNotationInput.length > 300) {
+      setError('Notasi maksimal 300 huruf!')
+      return
+    }
+
+    try {
+      await supabase
+        .from('artefak')
+        .update({ content: artefakNotationInput })
+        .eq('id', activeArtefakId)
+      
+      setSuccess('Notasi artefak diperbarui!')
+      setActiveArtefakId(null)
+      fetchArtefaks(userId)
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      setError('Gagal menyimpan notasi.')
+      console.error(err)
     }
   }
 
@@ -243,34 +301,58 @@ export default function Dashboard() {
                 >
                   Abadikan
                 </button>
-
-                <button
-                  onClick={() => setShowArtefakEmojis(!showArtefakEmojis)}
-                  style={{ position: 'absolute', top: '16px', right: '16px', width: '48px', height: '48px', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', fontSize: '24px', cursor: 'pointer', animation: 'pulse 2s ease-in-out infinite' }}
-                >
-                  ❤️
-                </button>
-
-                {showArtefakEmojis && (
-                  <div style={{ position: 'absolute', top: '80px', right: '16px', background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(4px)', borderRadius: '8px', padding: '16px', border: '1px solid rgba(255,255,255,0.3)', minWidth: '150px' }}>
-                    <p style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>Respons terakhir:</p>
-                    {artefakResponders.length > 0 ? (
-                      artefakResponders.slice(0, 3).map((user, i) => (
-                        <div key={i} style={{ fontSize: '14px', color: '#fff', marginBottom: '4px' }}>
-                          {user}
-                        </div>
-                      ))
-                    ) : (
-                      <p style={{ fontSize: '14px', color: '#666' }}>Belum ada respons</p>
-                    )}
-                  </div>
-                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* 2. RANT BOX SECTION */}
+        {/* 2. ARTEFAK TRAY */}
+        {artefaks.length > 0 && (
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Visual</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              {artefaks.map((art) => (
+                <div
+                  key={art.id}
+                  onClick={() => handleArtefakClick(art)}
+                  style={{
+                    aspectRatio: '1',
+                    background: '#111',
+                    border: '1px solid #222',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {/* Placeholder gambar — dalam praktik nyata bisa ganti dengan URL dari storage */}
+                  <div style={{ width: '100%', height: '100%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#444' }}>
+                    🖼️
+                  </div>
+                  {art.content && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      left: '8px',
+                      background: 'rgba(0,0,0,0.6)',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      maxWidth: '80%',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {art.content}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 3. RANT BOX SECTION */}
         <div style={{ marginBottom: '32px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Rant</h2>
           
@@ -302,14 +384,146 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* 4. JURNAL RANT - TERAKHIR 5 */}
+        {rants.length > 0 && (
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Jejak Rant</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {rants.map((rant) => {
+                const date = new Date(rant.created_at)
+                const formattedDate = date.toLocaleDateString('id-ID', {
+                  day: '2-digit',
+                  month: 'short'
+                })
+                return (
+                  <div key={rant.id} style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '16px', position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '8px', left: '8px', background: '#222', color: '#888', fontSize: '12px', padding: '2px 6px', borderRadius: '4px' }}>
+                      {formattedDate}
+                    </div>
+                    <p style={{ marginTop: '24px', fontSize: '15px', lineHeight: 1.5 }}>{rant.content}</p>
+                    
+                    {/* Emoji pulsing */}
+                    <button
+                      onClick={() => {}}
+                      style={{
+                        position: 'absolute',
+                        bottom: '12px',
+                        right: '12px',
+                        background: 'transparent',
+                        border: 'none',
+                        fontSize: '20px',
+                        cursor: 'pointer',
+                        animation: 'pulse 2s ease-in-out infinite'
+                      }}
+                    >
+                      💖
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 5. TAGLINE PENUTUP */}
+        <div style={{ textAlign: 'center', marginTop: '48px', fontSize: '15px', color: '#888', lineHeight: 1.6, padding: '16px' }}>
+          “This is our era. And we’re not asking for permission”<br />
+          <span style={{ color: '#343deb' }}>— Glitch Generation</span>
+        </div>
+
         {/* Logout */}
         <button
           onClick={handleLogout}
-          style={{ width: '100%', background: 'transparent', border: '1px solid #444', color: '#888', padding: '12px', borderRadius: '8px', cursor: 'pointer' }}
+          style={{ width: '100%', background: 'transparent', border: '1px solid #444', color: '#888', padding: '12px', borderRadius: '8px', cursor: 'pointer', marginTop: '32px' }}
         >
           Keluar
         </button>
       </div>
+
+      {/* Modal Notasi Artefak */}
+      {activeArtefakId !== null && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#111',
+            border: '1px solid #222',
+            borderRadius: '12px',
+            padding: '24px',
+            width: '90%',
+            maxWidth: '400px'
+          }}>
+            <h3 style={{ marginBottom: '16px', fontSize: '18px' }}>Tambahkan Notasi</h3>
+            <textarea
+              value={artefakNotationInput}
+              onChange={(e) => setArtefakNotationInput(e.target.value)}
+              placeholder="Tulis catatan pribadi (maks. 300 huruf)"
+              style={{
+                width: '100%',
+                background: '#000',
+                border: '1px solid #444',
+                borderRadius: '8px',
+                padding: '12px',
+                color: '#fff',
+                fontSize: '14px',
+                resize: 'vertical',
+                minHeight: '80px'
+              }}
+              maxLength={300}
+            />
+            <p style={{ fontSize: '12px', color: '#888', textAlign: 'right', marginTop: '4px' }}>
+              {artefakNotationInput.length}/300
+            </p>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+              <button
+                onClick={() => setActiveArtefakId(null)}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: '1px solid #444',
+                  color: '#888',
+                  padding: '8px',
+                  borderRadius: '8px'
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={saveArtefakNotation}
+                style={{
+                  flex: 1,
+                  background: '#343deb',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  fontWeight: '500'
+                }}
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CSS Animasi */}
+      <style jsx>{`
+        @keyframes pulse {
+          0% { transform: scale(1); opacity: 0.6; }
+          50% { transform: scale(1.15); opacity: 1; }
+          100% { transform: scale(1); opacity: 0.6; }
+        }
+      `}</style>
     </div>
   )
 }
