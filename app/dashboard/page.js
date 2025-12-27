@@ -13,18 +13,21 @@ export default function Dashboard() {
   const [artefakPreview, setArtefakPreview] = useState('')
   const [artefakNotation, setArtefakNotation] = useState('')
   const [canUploadArtefak, setCanUploadArtefak] = useState(true)
+  const [artefakList, setArtefakList] = useState([])
 
   // Rant states
   const [rantText, setRantText] = useState('')
   const [rantLoading, setRantLoading] = useState(false)
+  const [rantList, setRantList] = useState([])
 
   // Modal states
-  const [activeArtefakId, setActiveArtefakId] = useState(null)
+  const [activeArtefak, setActiveArtefak] = useState(null)
   const [artefakNotationInput, setArtefakNotationInput] = useState('')
 
   // General states
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setMounted(true)
@@ -40,15 +43,25 @@ export default function Dashboard() {
   }, [])
 
   const loadUser = async (uname) => {
-    const { data } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', uname)
-      .single()
-    
-    if (data) {
-      setUserId(data.id)
-      checkArtefakLimit(data.id)
+    try {
+      const { data } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', uname)
+        .single()
+      
+      if (data) {
+        setUserId(data.id)
+        await Promise.all([
+          checkArtefakLimit(data.id),
+          loadArtefakList(data.id),
+          loadRantList(data.id)
+        ])
+      }
+    } catch (err) {
+      console.error('Error loading user:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -65,6 +78,34 @@ export default function Dashboard() {
       .limit(1)
 
     setCanUploadArtefak(!data || data.length === 0)
+  }
+
+  const loadArtefakList = async (uid) => {
+    const { data, error } = await supabase
+      .from('artefak')
+      .select('*')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(6)
+
+    if (data) {
+      setArtefakList(data)
+    }
+    if (error) console.error('Error loading artefak:', error)
+  }
+
+  const loadRantList = async (uid) => {
+    const { data, error } = await supabase
+      .from('rants')
+      .select('*')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    if (data) {
+      setRantList(data)
+    }
+    if (error) console.error('Error loading rants:', error)
   }
 
   const handleImageChange = (e) => {
@@ -102,17 +143,28 @@ export default function Dashboard() {
     }
 
     try {
-      await supabase.from('artefak').insert([{
-        user_id: userId,
-        content: artefakNotation.trim(),
-        emoji_response: ''
-      }])
+      // Insert artefak ke database
+      const { data: newArtefak, error: insertError } = await supabase
+        .from('artefak')
+        .insert([{
+          user_id: userId,
+          content: artefakNotation.trim(),
+          emoji_response: ''
+        }])
+        .select()
+        .single()
+
+      if (insertError) throw insertError
       
       setSuccess('Artefak diabadikan! 🎉')
       setArtefakImage(null)
       setArtefakPreview('')
       setArtefakNotation('')
       setCanUploadArtefak(false)
+      
+      // Reload artefak list
+      await loadArtefakList(userId)
+      
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Gagal upload. Coba lagi.')
@@ -133,14 +185,25 @@ export default function Dashboard() {
 
     setRantLoading(true)
     try {
-      await supabase.from('rants').insert([{
-        user_id: userId,
-        content: rantText.trim(),
-        emoji_response: ''
-      }])
+      // Insert rant ke database
+      const { data: newRant, error: insertError } = await supabase
+        .from('rants')
+        .insert([{
+          user_id: userId,
+          content: rantText.trim(),
+          emoji_response: ''
+        }])
+        .select()
+        .single()
+
+      if (insertError) throw insertError
       
       setSuccess('Jejak terlepaskan! 💨')
       setRantText('')
+      
+      // Reload rant list
+      await loadRantList(userId)
+      
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Gagal kirim. Coba lagi.')
@@ -156,14 +219,46 @@ export default function Dashboard() {
     }
   }
 
-  const saveArtefakNotation = () => {
-    setSuccess('Notasi disimpan ✓')
-    setActiveArtefakId(null)
-    setArtefakNotationInput('')
-    setTimeout(() => setSuccess(''), 2000)
+  const handleArtefakClick = (artefak) => {
+    setActiveArtefak(artefak)
+    setArtefakNotationInput(artefak.content || '')
   }
 
-  if (!mounted || !username) {
+  const saveArtefakNotation = async () => {
+    if (!activeArtefak) return
+    
+    try {
+      const { error } = await supabase
+        .from('artefak')
+        .update({ content: artefakNotationInput })
+        .eq('id', activeArtefak.id)
+
+      if (error) throw error
+      
+      setSuccess('Notasi disimpan ✓')
+      setActiveArtefak(null)
+      setArtefakNotationInput('')
+      
+      // Reload artefak list
+      await loadArtefakList(userId)
+      
+      setTimeout(() => setSuccess(''), 2000)
+    } catch (err) {
+      setError('Gagal simpan notasi')
+      console.error(err)
+    }
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  if (!mounted || !username || loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-gray-400">Loading...</div>
@@ -175,7 +270,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-black text-white p-4 font-mono text-sm">
       <div className="max-w-2xl mx-auto space-y-4">
 
-        {/* HEADER - Minimal & Clean */}
+        {/* HEADER */}
         <header className="flex items-center justify-between pt-4 mb-4">
           <h1 className="text-2xl font-bold tracking-tight">NOPE</h1>
           <button
@@ -188,7 +283,7 @@ export default function Dashboard() {
           </button>
         </header>
 
-        {/* ALERTS - Compact */}
+        {/* ALERTS */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-xs text-center">
             {error}
@@ -201,7 +296,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* NAVIGASI - 4 Tombol (PADDING = 4, GAP = 4) */}
+        {/* NAVIGASI */}
         <nav className="grid grid-cols-4 gap-4 bg-gray-900 border border-gray-800 rounded-lg p-4">
           <button className="bg-blue-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-blue-700 transition-colors">
             Jejak
@@ -217,7 +312,7 @@ export default function Dashboard() {
           </button>
         </nav>
 
-        {/* ARTEFAK UPLOAD - Clean & Compact */}
+        {/* ARTEFAK UPLOAD */}
         <section className="bg-gray-900 border border-gray-800 rounded-lg p-4">
           {!artefakPreview ? (
             <label className={`block ${canUploadArtefak ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
@@ -243,7 +338,6 @@ export default function Dashboard() {
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
               <img src={artefakPreview} alt="Preview" className="w-full h-full object-cover"/>
               
-              {/* Notasi + CTA - Bottom Overlay (PADDING = 4, GAP = 4) */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
                 <div className="flex gap-4 items-end">
                   <input
@@ -270,7 +364,7 @@ export default function Dashboard() {
           )}
         </section>
 
-        {/* JEJAK (RANT) - (PADDING = 4) */}
+        {/* JEJAK (RANT INPUT) */}
         <section>
           <h2 className="text-base font-semibold mb-4 text-gray-300">Jejakmu</h2>
           
@@ -285,7 +379,6 @@ export default function Dashboard() {
                 maxLength={300}
               />
               
-              {/* Counter & CTA (MARGIN TOP = 4) */}
               <div className="flex items-center justify-between mt-4">
                 <span className="text-xs text-gray-500">{rantText.length}/300</span>
                 <button
@@ -300,53 +393,64 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* JEJAK TIMELINE (GAP = 4) */}
+        {/* JEJAK TIMELINE (REAL DATA) */}
         <section className="space-y-4">
-          {[...Array(3)].map((_, i) => {
-            const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
-            const formattedDate = date.toLocaleDateString('id-ID', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            })
-            return (
-              <div key={i} className="bg-gray-900 border border-gray-800 rounded-lg p-4 relative group hover:border-gray-700 transition-colors">
-                {/* Date Badge */}
+          {rantList.length > 0 ? (
+            rantList.map((rant) => (
+              <div key={rant.id} className="bg-gray-900 border border-gray-800 rounded-lg p-4 relative group hover:border-gray-700 transition-colors">
                 <span className="inline-block bg-gray-800 text-gray-400 text-xs px-2 py-0.5 rounded mb-4">
-                  {formattedDate}
+                  {formatDate(rant.created_at)}
                 </span>
                 
-                {/* Content */}
-                <p className="text-sm text-gray-400 leading-relaxed">
-                  Jejakmu akan muncul di sini. Tulisan yang kamu lepaskan akan tersimpan dalam timeline ini.
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  {rant.content}
                 </p>
                 
-                {/* Emoji Response */}
                 <button className="absolute bottom-4 right-4 text-xl hover:scale-110 transition-transform">
                   💖
                 </button>
               </div>
-            )
-          })}
+            ))
+          ) : (
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
+              <p className="text-sm text-gray-500">Belum ada jejak. Mulai tulis sesuatu!</p>
+            </div>
+          )}
         </section>
 
-        {/* TRAY ARTEFAK (GAP = 4) */}
+        {/* TRAY ARTEFAK (REAL DATA) */}
         <section>
           <h2 className="text-base font-semibold mb-4 text-gray-300">Artefak</h2>
           <div className="grid grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveArtefakId(i)}
-                className="aspect-square bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-600 transition-colors flex items-center justify-center text-xs text-gray-600"
-              >
-                #{i + 1}
-              </button>
-            ))}
+            {[...Array(6)].map((_, i) => {
+              const artefak = artefakList[i]
+              return (
+                <button
+                  key={i}
+                  onClick={() => artefak && handleArtefakClick(artefak)}
+                  className={`aspect-square bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-600 transition-colors flex items-center justify-center text-xs ${
+                    artefak ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                >
+                  {artefak ? (
+                    <div className="text-center p-2">
+                      <p className="text-xs font-medium truncate">
+                        {artefak.content || `#${i + 1}`}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formatDate(artefak.created_at).split(' ').slice(0, 2).join(' ')}
+                      </p>
+                    </div>
+                  ) : (
+                    `#${i + 1}`
+                  )}
+                </button>
+              )
+            })}
           </div>
         </section>
 
-        {/* TAGLINE - Elegant (PADDING TOP = 4) */}
+        {/* TAGLINE */}
         <footer className="text-center pt-4 pb-4 border-t border-gray-800 space-y-1">
           <p className="text-xs text-gray-500 italic">
             "This is our era. And we're not asking for permission"
@@ -368,8 +472,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MODAL NOTASI ARTEFAK (PADDING = 4, GAP = 4) */}
-      {activeArtefakId !== null && (
+      {/* MODAL NOTASI ARTEFAK */}
+      {activeArtefak && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 w-full max-w-sm">
             <h3 className="text-base font-semibold mb-4">Tambah Notasi</h3>
@@ -383,7 +487,7 @@ export default function Dashboard() {
             />
             <div className="flex gap-4 mt-4">
               <button
-                onClick={() => setActiveArtefakId(null)}
+                onClick={() => setActiveArtefak(null)}
                 className="flex-1 bg-gray-800 text-gray-300 py-2 rounded text-sm font-medium hover:bg-gray-700 transition-colors"
               >
                 Batal
