@@ -6,7 +6,7 @@ export default function Dashboard() {
   const [username, setUsername] = useState('')
   const [userId, setUserId] = useState('')
   const [mounted, setMounted] = useState(false)
-  const [showSettings, setShowSettings] = useState(false) // menu titik 3
+  const [showSettings, setShowSettings] = useState(false)
 
   // Artefak states
   const [artefakImage, setArtefakImage] = useState(null)
@@ -375,6 +375,7 @@ export default function Dashboard() {
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
                 
+                {/* NOTASI + CTA UNGGAH DI DALAM BOX, RATA KANAN BAWAH */}
                 <div style={{ 
                   position: 'absolute', 
                   bottom: '8px', 
@@ -437,49 +438,48 @@ export default function Dashboard() {
             padding: '16px', 
             position: 'relative' 
           }}>
-            <div style={{ position: 'relative' }}>
-              <textarea
-                value={rantText}
-                onChange={(e) => setRantText(e.target.value)}
-                placeholder="...perasaanmu dalam 300 huruf"
-                style={{ 
-                  width: '100%', 
-                  background: '#000', 
-                  border: '1px solid #444', 
-                  borderRadius: '6px', 
-                  padding: '8px', 
-                  color: '#fff', 
-                  fontSize: '14px', 
-                  resize: 'vertical',
-                  minHeight: '80px',
-                  lineHeight: '1.4',
-                  paddingRight: '60px' // ruang untuk tombol
-                }}
-                maxLength={300}
-              />
-              
-              <button
-                onClick={handleRantSubmit}
-                disabled={rantLoading || !rantText.trim()}
-                style={{
-                  position: 'absolute',
-                  bottom: '8px',
-                  right: '8px',
-                  background: 'rgba(59, 130, 246, 0.2)',
-                  color: '#fff',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  animation: 'pulse 2s ease-in-out infinite',
-                  opacity: 0.2
-                }}
-              >
-                {rantLoading ? '...' : 'lepaskan'}
-              </button>
-            </div>
+            <textarea
+              value={rantText}
+              onChange={(e) => setRantText(e.target.value)}
+              placeholder="...perasaanmu dalam 300 huruf"
+              style={{ 
+                width: '100%', 
+                background: '#000', 
+                border: '1px solid #444', 
+                borderRadius: '6px', 
+                padding: '8px', 
+                color: '#fff', 
+                fontSize: '14px', 
+                resize: 'vertical',
+                minHeight: '80px',
+                lineHeight: '1.4',
+                paddingRight: '60px' // ruang untuk tombol
+              }}
+              maxLength={300}
+            />
+            
+            {/* CTA LEPASKAN DI DALAM BOX, RATA KANAN BAWAH */}
+            <button
+              onClick={handleRantSubmit}
+              disabled={rantLoading || !rantText.trim()}
+              style={{
+                position: 'absolute',
+                bottom: '8px',
+                right: '8px',
+                background: 'rgba(59, 130, 246, 0.2)',
+                color: '#fff',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: '500',
+                animation: 'pulse 2s ease-in-out infinite',
+                opacity: 0.2
+              }}
+            >
+              {rantLoading ? '...' : 'lepaskan'}
+            </button>
           </div>
         </div>
 
